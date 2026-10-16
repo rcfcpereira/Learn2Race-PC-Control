@@ -1,0 +1,3 @@
+gazebo/worlds/
+__pycache__/
+*.pyc

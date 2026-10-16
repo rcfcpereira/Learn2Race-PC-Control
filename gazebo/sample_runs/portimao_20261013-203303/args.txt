@@ -1,0 +1,3 @@
+bringup: competition:=true mode:=trackbotgp sensor_host:=pi rgb_stick:=true track_light_level:=255 track:=portimao
+follower: bend_speed:=0.0  max_linear_speed:=0.5 race_mode:=trackbotgp record_every_n:=20
+preview: off
