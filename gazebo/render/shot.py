@@ -9,6 +9,9 @@ cx, cy = w / 2, h / 2
 dist, height = 1.45, 3.0
 CAM = {"dragster": os.environ.get("CAMPOSE") or "0.40 -0.70 0.60 0 0.36 1.5708"}
 W, H, FOV = (1800, 1200, 1.0) if track == "dragster" else (1500, 1800, 0.62)
+if os.environ.get("CAMSIZE"):
+    W, H, FOV = (float(v) for v in os.environ["CAMSIZE"].split())
+    W, H = int(W), int(H)
 pose = CAM.get(track, f"{cx:.3f} {cy - dist:.3f} {height:.3f} 0 {math.atan2(height, dist):.3f} 1.5708")
 cam = f"""
     <model name="appe_camera"><static>true</static>
@@ -16,7 +19,7 @@ cam = f"""
       <link name="l"><sensor name="cam" type="camera">
         <topic>appe_cam</topic><update_rate>5</update_rate><always_on>1</always_on>
         <camera><horizontal_fov>{FOV}</horizontal_fov><image><width>{W}</width><height>{H}</height></image>
-        <clip><near>0.05</near><far>20</far></clip></camera>
+        <clip><near>0.05</near><far>400</far></clip></camera>
       </sensor></link></model>
     <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin>
   </world>"""
