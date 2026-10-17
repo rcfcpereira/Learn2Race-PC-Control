@@ -6,6 +6,9 @@ images where the 20 mm line is 10 px wide, i.e. 2 mm per pixel (Portimao's drawn
 drive axle 37 mm from the back, a 8.94 mm castor ball 128 mm from the back, the camera board at the front.
 
     python gazebo/make_world.py TRACK      (monza | portimao | suzuka | dragster; writes worlds/TRACK.sdf)
+
+The Dragster floor comes from make_dragster_texture.py (rules dimensions) and its world adds the start-light
+gantry over the start line.
 """
 # References (full entries: docs/references.md at the repository root):
 #   [R1] ISEP, TrackBotGP competition rules (2026 Robotics@ISEP Open): track figures
@@ -19,8 +22,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MM_PX = 2.0                      # mm per drawing pixel (20 mm line = 10 px)
 # the finish line on the main straight, in drawing pixels (x, y), and the start heading (up the drawing)
 FINISH_PX = {"monza": (107, 840), "portimao": (109, 804), "suzuka": (116, 409),
-             # dragster (texture from the rules dimensions): left lane centre, just behind the start line
-             "dragster": (100, 5500)}            # the start line (400 mm from the near end)
+             # dragster (make_dragster_texture.py): left lane centre on the start line
+             "dragster": (125, 6000)}
 
 
 def wsl_path(p):
@@ -84,6 +87,36 @@ def robot_model(pose=(0.0, 0.0, 0.0)):
     </model>"""
 
 
+def gantry(x, y):
+    """Start-light gantry of the Dragster rules (IV-3, Figure 6): about 70 cm wide and 30 cm high, over the
+    start line at (x, y), with a "traffic light" (four LEDs, white when on) over the middle of each lane."""
+    alu = "<material><diffuse>0.75 0.76 0.78 1</diffuse></material>"
+    parts = []
+    for i, dx in enumerate((-0.35, 0.35)):           # legs, with feet along the track
+        parts.append(f"""<visual name="leg{i}"><pose>{dx} 0 0.16 0 0 0</pose>
+          <geometry><box><size>0.02 0.02 0.32</size></box></geometry>{alu}</visual>
+        <visual name="foot{i}"><pose>{dx} 0 0.01 0 0 0</pose>
+          <geometry><box><size>0.02 0.30 0.02</size></box></geometry>{alu}</visual>""")
+    parts.append(f"""<visual name="beam"><pose>0 0 0.32 0 0 0</pose>
+          <geometry><box><size>0.72 0.02 0.02</size></box></geometry>{alu}</visual>""")
+    for i, dx in enumerate((-0.15, 0.15)):           # one light per lane, LEDs facing down
+        parts.append(f"""<visual name="light{i}"><pose>{dx} 0 0.285 0 0 0</pose>
+          <geometry><box><size>0.05 0.035 0.05</size></box></geometry>
+          <material><diffuse>0.05 0.05 0.05 1</diffuse></material></visual>""")
+        for j, (lx, ly) in enumerate(((-0.01, -0.006), (0.01, -0.006), (-0.01, 0.006), (0.01, 0.006))):
+            parts.append(f"""<visual name="led{i}{j}"><pose>{dx + lx} {ly} 0.258 0 0 0</pose>
+          <geometry><cylinder><radius>0.0025</radius><length>0.004</length></cylinder></geometry>
+          <material><diffuse>0.9 0.95 1 1</diffuse><emissive>0.9 0.95 1 1</emissive></material></visual>""")
+    return f"""
+    <model name="start_gantry">
+      <static>true</static>
+      <pose>{x:.4f} {y:.4f} 0 0 0 0</pose>
+      <link name="frame">
+        {chr(10).join(parts)}
+      </link>
+    </model>"""
+
+
 def world(track):
     tex = os.path.join(HERE, "media", f"track_{track}.png")
     h_px, w_px = cv2.imread(tex, cv2.IMREAD_GRAYSCALE).shape
@@ -113,10 +146,18 @@ def world(track):
           </material>
         </visual>
       </link>
-    </model>{robot_model(start_pose(track, h_m))}
+    </model>{robot_model(start_pose(track, h_m))}{extras(track, h_m)}
   </world>
 </sdf>
 """, (w_m, h_m)
+
+
+def extras(track, h_m):
+    if track != "dragster":
+        return ""
+    fx, fy = FINISH_PX[track]
+    # the gantry is centred on the two lanes (one lane width right of the left lane's centre), over the start line
+    return gantry(fx * MM_PX / 1000 + 0.15, h_m - fy * MM_PX / 1000)
 
 
 def start_pose(track, h_m):
