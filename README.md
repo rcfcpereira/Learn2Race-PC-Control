@@ -11,7 +11,7 @@ The robots run on their own. Nothing here is needed during a race.
 |---|---|---|
 | [`teleop/`](teleop/) | `gamepad_udp.py`: Xbox-style pad → UDP → robot | Windows, plain Python |
 | [`rviz/`](rviz/) | `rviz_b.sh` + `slam_view.rviz`: live map, scan and robot pose of Prototype B | WSL (Ubuntu 24.04) with ROS 2 Jazzy |
-| [`gazebo/`](gazebo/README.md) | Track worlds and race replay for Prototype A | WSL with Gazebo Harmonic |
+| [`gazebo/`](gazebo/README.md) | Track worlds, race replay and video, and a closed-loop simulation in which Prototype A's line follower drives a simulated robot | WSL with Gazebo Harmonic |
 | [`docs/references.md`](docs/references.md) | References cited in the code headers as `[Rnn]` | |
 
 Installation: [INSTALL.md](INSTALL.md).

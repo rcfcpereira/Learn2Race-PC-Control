@@ -1,0 +1,21 @@
+[INFO] [competition_fsm-7]: process started with pid [12706]
+[INFO] [gp_referee-8]: process started with pid [12707]
+[gp_referee-8] [INFO] [1791919993.569335079] [gp_referee]: GP referee waiting for the start light; pit lane on the right, lap 8.10 m.
+[competition_fsm-7] [INFO] [1791919995.256759401] [competition_fsm]: Competition FSM ready in trackbotgp mode.
+[gp_referee-8] [INFO] [1791920006.757398262] [gp_referee]: Start light: 910 vs ambient 200
+[competition_fsm-7] [INFO] [1791920006.763066710] [competition_fsm]: READY -> LAP1
+[gp_referee-8] [INFO] [1791920006.768465971] [gp_referee]: Race started.
+[gp_referee-8] [INFO] [1791920050.207107005] [gp_referee]: lap 1 done: 8.50 m
+[gp_referee-8] [INFO] [1791920050.209635407] [gp_referee]: Lap time 43.44 s
+[competition_fsm-7] [INFO] [1791920050.215335596] [competition_fsm]: LAP1 -> LAP2
+[gp_referee-8] [INFO] [1791920087.708535324] [gp_referee]: pit armed at 7.22 m into lap 2
+[gp_referee-8] [INFO] [1791920092.695700419] [gp_referee]: pit-lane fork taken at 7.98 m into lap 2
+[gp_referee-8] [INFO] [1791920096.006444487] [gp_referee]: pit stop 0.50 m into the pit lane
+[competition_fsm-7] [INFO] [1791920096.011921626] [competition_fsm]: LAP2 -> PIT
+[competition_fsm-7] [INFO] [1791920101.321301915] [competition_fsm]: PIT -> LAP3
+[gp_referee-8] [INFO] [1791920101.326693115] [gp_referee]: Lap time 51.12 s
+[gp_referee-8] [INFO] [1791920101.329323783] [gp_referee]: lap 2 done through the pit: 8.50 m
+[gp_referee-8] [INFO] [1791920145.519607715] [gp_referee]: lap 3 done: 8.41 m
+[gp_referee-8] [INFO] [1791920145.522706462] [gp_referee]: Lap time 44.20 s
+[competition_fsm-7] [INFO] [1791920145.535028999] [competition_fsm]: LAP3 -> FINISH
+[gp_referee-8] [INFO] [1791920145.542719328] [gp_referee]: Race over in 138.77 s; laps 8.50 m, 8.50 m, 8.41 m

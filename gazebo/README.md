@@ -38,3 +38,51 @@ Any run folder copied from the robot (`~/run_logs/<date-time>/`, recorded with `
 ## Limits
 
 The replayed path is dead reckoning, not localisation. It keeps the shape of the race but drifts from the drawn line over a lap, because of the integrated gyro's scale error and wheel slip during line searches.
+
+## Closed loop: Prototype A's line follower driving a simulated robot
+
+`sim_follow.sh TRACK SECONDS OUT_DIR [SPEED] [follower args]` runs the robot's own `line_follower_node`
+(package `learn2race_camera_follower` of Learn2Race-PrototypeA, unchanged) against a simulated robot, and films it.
+
+- `make_sim_world.py` turns a track world into a driven one: Prototype A's wheels (64.9 mm on a 180.5 mm track),
+  a frictionless castor, about 1.0 kg, a differential drive on `/cmd_vel` and `/odom`, and the line camera copied
+  from the real one (IMX219, 320 × 240 px, 62.2°, lens 143 mm ahead of the axle and 65 mm up, 53° below
+  horizontal) on `/image_raw`. A fixed camera films the GP circuits from above; on the Dragster a camera follows
+  behind the robot.
+- `ros_gz_bridge` connects `/image_raw`, `/cmd_vel` and `/odom`. The follower takes the track's arguments from
+  `config/track_TRACK.yaml` of Prototype A, as on the robot. CycloneDDS, ROS domain 42 and localhost discovery
+  keep the simulation apart from the robots (Fast DDS delivered nothing between processes under WSL).
+- `sim_record.py` saves the frames with the model's true pose (`frames/pose.csv`); `encode_video.py` makes an MP4.
+
+Set-up (WSL, once):
+
+```bash
+sudo apt install -y ros-jazzy-rmw-cyclonedds-cpp ros-jazzy-cv-bridge
+export L2R_A=/mnt/c/<path>/Learn2Race-PrototypeA      # default: the sibling folder in the Learn2Race repository
+mkdir -p ~/l2r_sim_ws/src && ln -s $L2R_A/learn2race_ws/src/learn2race_camera_follower ~/l2r_sim_ws/src/
+cd ~/l2r_sim_ws && source /opt/ros/jazzy/setup.bash && colcon build --symlink-install
+```
+
+Runs (speeds as raced: 0.5 m/s on the GP circuits, 1.0 m/s on the Dragster):
+
+```bash
+bash gazebo/sim_follow.sh portimao 210 /tmp/sim_portimao 0.5
+bash gazebo/sim_follow.sh dragster 40 /tmp/sim_dragster 1.0 race_mode:=dragster
+python gazebo/encode_video.py //wsl.localhost/Ubuntu-24.04/tmp/sim_portimao/frames sim_portimao.mp4 17   # Windows
+```
+
+Results of the first runs (17 October 2026): Monza about six clean laps; Portimão about four laps, cutting inside
+the tightest hairpin, two line losses; Suzuka lost at the crossing and the hairpins, as on the real track;
+Dragster 10 m at 1.0 m/s in about 10.5 s, slowing to a stop at the finish stripe.
+
+What the simulation leaves out: the drive is ideal (no motor lag), the floor is uniform (no glare, seams or track
+light), the competition nodes (referee, state machine, pit stop, the Dragster stop) do not run, and the camera
+renders at what the PC manages (about 30 Hz against the real 41.8 fps). It shows the detector and the steering in
+closed loop on the real track geometry, not race performance.
+
+## Replay video of a recorded race
+
+`video_race.py RUN_DIR TRACK OUT_DIR [SPEED] [FPS]` renders a recorded race with the robot placed on the drawn
+line by `track_route.py`: the recorded distance and timing of each lap (`rec.csv`, `referee.log`) are scaled
+onto the drawn centreline, so speed changes, line searches and the pit stop keep their real timing. The trail is
+coloured by lap. `sample_runs/portimao_20261013-203303/` has everything it needs.
