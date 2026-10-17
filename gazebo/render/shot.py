@@ -7,7 +7,6 @@ track = sys.argv[1]
 text, (w, h) = make_world.world(track)
 cx, cy = w / 2, h / 2
 dist, height = 1.45, 3.0
-import os
 CAM = {"dragster": os.environ.get("CAMPOSE") or "0.40 -0.70 0.60 0 0.36 1.5708"}
 W, H, FOV = (1800, 1200, 1.0) if track == "dragster" else (1500, 1800, 0.62)
 pose = CAM.get(track, f"{cx:.3f} {cy - dist:.3f} {height:.3f} 0 {math.atan2(height, dist):.3f} 1.5708")

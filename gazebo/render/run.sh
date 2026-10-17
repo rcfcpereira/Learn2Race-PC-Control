@@ -1,7 +1,7 @@
 #!/bin/bash
-# Figure appe_gazebo_track.png (appendix): render a world from a fixed camera, headless, in WSL:
-#   CAMPOSE="x y z roll pitch yaw" overrides the dragster camera (default: behind the start line)
-#   wsl -d Ubuntu-24.04 -- bash /mnt/c/.../docs/sim/gazebo/figure/run.sh portimao /mnt/c/.../out.png
+# Render a track world from a fixed camera, headless, and save one image (run in WSL):
+#   bash gazebo/render/run.sh portimao /mnt/c/.../portimao.png
+#   CAMPOSE="x y z roll pitch yaw" overrides the Dragster camera (default: behind the start line)
 source /opt/ros/jazzy/setup.bash
 export LIBGL_ALWAYS_SOFTWARE=1
 D=$(dirname "$0"); T=$1; OUT=$2
